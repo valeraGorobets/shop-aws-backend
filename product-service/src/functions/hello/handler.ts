@@ -5,9 +5,9 @@ import { middyfy } from '@libs/lambda';
 import schema from './schema';
 
 const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
-  return formatJSONResponse({
-    message: `Hello ${event.queryStringParameters.name}`,
-  });
+	return formatJSONResponse({
+		message: `Hello ${ event.queryStringParameters.name }`,
+	});
 };
 
 export const main = middyfy(hello);

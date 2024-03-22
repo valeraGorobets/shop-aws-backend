@@ -1,10 +1,4 @@
-export interface IProduct {
-	count: number;
-	description: string;
-	id: string;
-	price: number;
-	title: string;
-}
+import { IProduct } from "../types/api-types";
 
 export class ProductsDbService {
 	private db: IProduct[] = [

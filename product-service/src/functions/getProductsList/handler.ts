@@ -3,7 +3,8 @@ import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
-import { IProduct, ProductsDbService } from "../../db/products-db.service";
+import { ProductsDbService } from "../../db/products-db.service";
+import { IProduct } from "../../types/api-types";
 
 const productsDbService: ProductsDbService = new ProductsDbService();
 const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async () => {
@@ -12,4 +13,3 @@ const getProductsList: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
 };
 
 export const main = middyfy(getProductsList);
-// message: `Hello ${ event.queryStringParameters.name }`,

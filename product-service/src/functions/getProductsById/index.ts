@@ -7,6 +7,17 @@ export default {
 			httpApi: {
 				method: 'GET',
 				path: '/products/{id}',
+				responses: {
+					default: {},
+					200: {
+						description: 'Getting product by id',
+						bodyType: 'IProduct',
+					},
+					404: {
+						description: 'Id not found',
+						bodyType: 'String',
+					}
+				},
 			},
 		},
 	],

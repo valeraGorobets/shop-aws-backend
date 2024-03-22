@@ -4,7 +4,7 @@ import type { FromSchema } from "json-schema-to-ts";
 type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> }
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>
 
-export const formatJSONResponse = (response: any) => {
+export const formatJSONResponse = (response: any, statusCode: number = 200) => {
 	return {
 		headers: {
 			// Required for CORS support to work
@@ -12,7 +12,7 @@ export const formatJSONResponse = (response: any) => {
 			// Required for cookies, authorization headers with HTTPS
 			'Access-Control-Allow-Credentials': true,
 		},
-		statusCode: 200,
+		statusCode,
 		body: JSON.stringify(response)
 	}
 }

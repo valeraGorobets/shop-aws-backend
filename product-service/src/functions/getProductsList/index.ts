@@ -6,7 +6,7 @@ export default {
 		{
 			httpApi: {
 				method: 'GET',
-				path: '/getProductsList',
+				path: '/products',
 			},
 		},
 	],

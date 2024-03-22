@@ -10,11 +10,22 @@ const serverlessConfiguration: AWS = {
 	provider: {
 		name: 'aws',
 		runtime: 'nodejs20.x',
-		stage: 'dev',
+		stage: 'beta',
 		region: 'eu-west-1',
 		apiGateway: {
 			minimumCompressionSize: 1024,
 			shouldStartNameWithService: true,
+		},
+		httpApi: {
+			cors: {
+				allowCredentials: false,
+				maxAge: 300,
+				allowedMethods: ['GET'],
+				allowedOrigins: [
+					'http://localhost:4200',
+					'https://d1cu1goqkk0ah.cloudfront.net',
+				]
+			}
 		},
 		environment: {
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',

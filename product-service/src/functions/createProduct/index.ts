@@ -1,19 +1,26 @@
 import { handlerPath } from '@libs/handler-resolver';
+import schema from './schema';
 
 export default {
 	handler: `${ handlerPath(__dirname) }/handler.main`,
 	events: [
 		{
 			httpApi: {
-				method: 'GET',
-				path: '/products/{id}',
+				method: 'POST',
+				path: '/products',
+				request: {
+					schemas: {
+						'application/json': schema,
+					},
+				},
+				bodyType: 'ICreateProductDTO',
 				responses: {
 					default: {},
 					200: {
-						description: 'Getting product by id',
+						description: 'Created product',
 						bodyType: 'IProduct',
 					},
-					404: 'Id not found'
+					400: 'Bad Request'
 				},
 			},
 		},

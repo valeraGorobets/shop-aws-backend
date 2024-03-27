@@ -1,6 +1,13 @@
-import { IProduct, IStock } from '../types/api-types';
+import { ICreateProductDTO, IProduct, IStock } from '../types/api-types';
 import { DatabaseService } from './db.service';
-import { GetCommandInput, GetCommandOutput, ScanCommandInput, ScanCommandOutput } from '@aws-sdk/lib-dynamodb';
+import {
+	GetCommandInput,
+	GetCommandOutput,
+	PutCommandInput,
+	ScanCommandInput,
+	ScanCommandOutput
+} from '@aws-sdk/lib-dynamodb';
+import { v4 as uuidv4 } from 'uuid';
 
 const ProductsTable: string = process.env.PRODUCTS_TABLE;
 const StocksTable: string = process.env.STOCKS_TABLE;
@@ -46,6 +53,40 @@ export class ProductsDbService extends DatabaseService {
 			const product: IProduct = productsOutput?.Item as IProduct;
 			const stock: IStock = stocksOutput?.Item as IStock;
 			return product && this.mergeProductWithCount(product, stock);
+		} catch (error) {
+			return error;
+		}
+	}
+
+	public async createProduct(productDTO: ICreateProductDTO): Promise<IProduct> {
+		const id: string = uuidv4();
+		const productParams: PutCommandInput = {
+			TableName: ProductsTable,
+			Item: {
+				id,
+				...productDTO,
+			}
+		};
+
+		const stocksParams: PutCommandInput = {
+			TableName: StocksTable,
+			Item: {
+				product_id: id,
+				count: productDTO.count,
+			},
+		};
+		try {
+			await this.transactionWrite({
+				TransactItems: [
+					productParams,
+					stocksParams,
+				],
+			});
+
+			return {
+				id,
+				...productDTO,
+			};
 		} catch (error) {
 			return error;
 		}

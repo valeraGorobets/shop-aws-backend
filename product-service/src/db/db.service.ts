@@ -12,11 +12,16 @@ import {
 	PutCommandOutput,
 	ScanCommand,
 	ScanCommandOutput,
+	TransactWriteCommand,
 	UpdateCommand,
 	UpdateCommandInput,
 	UpdateCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { ScanCommandInput } from '@aws-sdk/lib-dynamodb/dist-types/commands/ScanCommand';
+import {
+	TransactWriteCommandInput,
+	TransactWriteCommandOutput,
+} from '@aws-sdk/lib-dynamodb/dist-types/commands/TransactWriteCommand';
 
 
 const dynamodbClient: DynamoDBClient = new DynamoDBClient({
@@ -61,6 +66,14 @@ export abstract class DatabaseService {
 	public async delete(params: DeleteCommandInput): Promise<DeleteCommandOutput> {
 		try {
 			return await documentClient.send(new DeleteCommand(params));
+		} catch (error) {
+			throw new Error(error);
+		}
+	};
+
+	public async transactionWrite(params: TransactWriteCommandInput): Promise<TransactWriteCommandOutput> {
+		try {
+			return await documentClient.send(new TransactWriteCommand(params));
 		} catch (error) {
 			throw new Error(error);
 		}

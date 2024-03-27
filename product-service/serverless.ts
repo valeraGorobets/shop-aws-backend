@@ -34,11 +34,73 @@ const serverlessConfiguration: AWS = {
 		environment: {
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
 			NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+			PRODUCTS_TABLE: 'ProductsTable',
+			STOCKS_TABLE: 'StocksTable',
+		},
+		iam: {
+			role: {
+				statements: [
+					{
+						Effect: 'Allow',
+						Action: [
+							'dynamodb:DescribeTable',
+							'dynamodb:Query',
+							'dynamodb:Scan',
+							'dynamodb:GetItem',
+							'dynamodb:PutItem',
+							'dynamodb:UpdateItem',
+							'dynamodb:DeleteItem',
+						],
+						Resource: [
+							{ 'Fn::GetAtt': ['${self:provider.environment.PRODUCTS_TABLE}', 'Arn'] },
+							{ 'Fn::GetAtt': ['${self:provider.environment.STOCKS_TABLE}', 'Arn'] },
+						],
+					},
+				],
+			},
 		},
 	},
 	functions: {
 		getProductsList,
 		getProductsById,
+	},
+	resources: {
+		Resources: {
+			ProductsTable: {
+				Type: 'AWS::DynamoDB::Table',
+				DeletionPolicy: 'Delete',
+				Properties: {
+					TableName: '${self:provider.environment.PRODUCTS_TABLE}',
+					AttributeDefinitions: [
+						{ AttributeName: 'id', AttributeType: 'S' },
+					],
+					KeySchema: [
+						{ AttributeName: 'id', KeyType: 'HASH' },
+					],
+					ProvisionedThroughput: {
+						ReadCapacityUnits: 1,
+						WriteCapacityUnits: 1,
+					},
+				},
+			},
+			StocksTable: {
+				Type: 'AWS::DynamoDB::Table',
+				DeletionPolicy: 'Delete',
+				Properties: {
+					TableName: '${self:provider.environment.STOCKS_TABLE}',
+					AttributeDefinitions: [
+						{ AttributeName: 'product_id', AttributeType: 'S' },
+					],
+					KeySchema: [
+						{ AttributeName: 'product_id', KeyType: 'HASH' },
+					],
+					ProvisionedThroughput: {
+						ReadCapacityUnits: 1,
+						WriteCapacityUnits: 1,
+					},
+				},
+			}
+		}
 	},
 	package: { individually: true },
 	custom: {

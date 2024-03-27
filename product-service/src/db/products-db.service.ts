@@ -5,7 +5,7 @@ import {
 	GetCommandOutput,
 	PutCommandInput,
 	ScanCommandInput,
-	ScanCommandOutput
+	ScanCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,16 +20,12 @@ export class ProductsDbService extends DatabaseService {
 		const stocksParams: ScanCommandInput = {
 			TableName: StocksTable,
 		};
-		try {
-			const productsOutput: ScanCommandOutput = await this.scan(productsParams);
-			const stocksOutput: ScanCommandOutput = await this.scan(stocksParams);
+		const productsOutput: ScanCommandOutput = await this.scan(productsParams);
+		const stocksOutput: ScanCommandOutput = await this.scan(stocksParams);
 
-			const products: IProduct[] = productsOutput?.Items as IProduct[];
-			const stocks: IStock[] = stocksOutput?.Items as IStock[];
-			return this.mergeProductsWithStocks(products, stocks);
-		} catch (error) {
-			return error;
-		}
+		const products: IProduct[] = productsOutput?.Items as IProduct[];
+		const stocks: IStock[] = stocksOutput?.Items as IStock[];
+		return this.mergeProductsWithStocks(products, stocks);
 	}
 
 	public async getProductById(id: string): Promise<IProduct> {
@@ -46,16 +42,12 @@ export class ProductsDbService extends DatabaseService {
 				product_id: id,
 			},
 		};
-		try {
-			const productsOutput: GetCommandOutput = await this.get(productParams);
-			const stocksOutput: GetCommandOutput = await this.get(stocksParams);
+		const productsOutput: GetCommandOutput = await this.get(productParams);
+		const stocksOutput: GetCommandOutput = await this.get(stocksParams);
 
-			const product: IProduct = productsOutput?.Item as IProduct;
-			const stock: IStock = stocksOutput?.Item as IStock;
-			return product && this.mergeProductWithCount(product, stock);
-		} catch (error) {
-			return error;
-		}
+		const product: IProduct = productsOutput?.Item as IProduct;
+		const stock: IStock = stocksOutput?.Item as IStock;
+		return product && this.mergeProductWithCount(product, stock);
 	}
 
 	public async createProduct(productDTO: ICreateProductDTO): Promise<IProduct> {
@@ -65,7 +57,7 @@ export class ProductsDbService extends DatabaseService {
 			Item: {
 				id,
 				...productDTO,
-			}
+			},
 		};
 
 		const stocksParams: PutCommandInput = {
@@ -75,34 +67,30 @@ export class ProductsDbService extends DatabaseService {
 				count: productDTO.count,
 			},
 		};
-		try {
-			await this.transactionWrite({
-				TransactItems: [
-					productParams,
-					stocksParams,
-				],
-			});
+		await this.transactionWrite({
+			TransactItems: [
+				productParams,
+				stocksParams,
+			],
+		});
 
-			return {
-				id,
-				...productDTO,
-			};
-		} catch (error) {
-			return error;
-		}
+		return {
+			id,
+			...productDTO,
+		};
 	}
 
 	private mergeProductsWithStocks(products: IProduct[] = [], stocks: IStock[] = []): IProduct[] {
 		return products.map((product: IProduct) => {
 			const stock: IStock = stocks.find(({ product_id }: IStock): boolean => product.id == product_id);
 			return this.mergeProductWithCount(product, stock);
-		})
+		});
 	}
 
 	private mergeProductWithCount(product: IProduct, stock: IStock): IProduct {
 		return {
 			...product,
 			count: stock?.count || 0,
-		}
+		};
 	}
 }

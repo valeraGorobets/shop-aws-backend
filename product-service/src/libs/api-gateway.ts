@@ -16,3 +16,7 @@ export const formatJSONResponse = (response: any, statusCode: number = 200) => {
 		body: JSON.stringify(response)
 	}
 }
+
+export const handleErrorResponse = (error, source: string) => {
+	return formatJSONResponse({ message: `Backend Error in ${ source }: ${ JSON.stringify(error) }` }, 500);
+}

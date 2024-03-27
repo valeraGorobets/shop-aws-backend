@@ -20,7 +20,8 @@ export default {
 						description: 'Created product',
 						bodyType: 'IProduct',
 					},
-					400: 'Bad Request'
+					400: 'Bad Request',
+					500: 'Backend Error',
 				},
 			},
 		},

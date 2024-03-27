@@ -12,7 +12,8 @@ export default {
 					200: {
 						description: 'List with all products',
 						bodyType: 'IProductArray',
-					}
+					},
+					500: 'Backend Error',
 				},
 			},
 		},

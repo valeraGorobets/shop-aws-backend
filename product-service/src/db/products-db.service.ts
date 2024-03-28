@@ -68,10 +68,11 @@ export class ProductsDbService extends DatabaseService {
 			},
 		};
 		await this.transactionWrite({
-			TransactItems: [
-				productParams,
-				stocksParams,
-			],
+			TransactItems: [{
+				Put: productParams,
+			}, {
+				Put: stocksParams,
+			}],
 		});
 
 		return {

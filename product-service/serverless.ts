@@ -79,10 +79,7 @@ const serverlessConfiguration: AWS = {
 					KeySchema: [
 						{ AttributeName: 'id', KeyType: 'HASH' },
 					],
-					ProvisionedThroughput: {
-						ReadCapacityUnits: 1,
-						WriteCapacityUnits: 1,
-					},
+					BillingMode: 'PAY_PER_REQUEST'
 				},
 			},
 			StocksTable: {
@@ -96,10 +93,7 @@ const serverlessConfiguration: AWS = {
 					KeySchema: [
 						{ AttributeName: 'product_id', KeyType: 'HASH' },
 					],
-					ProvisionedThroughput: {
-						ReadCapacityUnits: 1,
-						WriteCapacityUnits: 1,
-					},
+					BillingMode: 'PAY_PER_REQUEST'
 				},
 			}
 		}

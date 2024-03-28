@@ -1,0 +1,62 @@
+[
+	{
+		"id": "ed8e8bcf-2cb7-4c62-91a4-77e08f87645a",
+		"title": "Toyota Camry",
+		"description": "Reliable sedan with spacious interior and fuel-efficient engine.",
+		"price": 25000
+	},
+	{
+		"id": "43c49c0e-f263-4924-81d7-f3e46ac5d0db",
+		"title": "Honda Civic",
+		"description": "Compact car known for its sporty design and agile handling.",
+		"price": 18000
+	},
+	{
+		"id": "26702c5a-68d1-4a67-91f0-623418d95ba5",
+		"title": "BMW 3 Series",
+		"description": "Luxurious sedan with powerful engine options and advanced technology features.",
+		"price": 45000
+	},
+	{
+		"id": "4b168745-7435-4fb3-96a5-bb513e759754",
+		"title": "Ford Mustang",
+		"description": "Iconic American muscle car with a bold design and impressive performance.",
+		"price": 35000
+	},
+	{
+		"id": "ae0d3cf5-ff61-4415-8038-ff5b9517fc51",
+		"title": "Chevrolet Silverado",
+		"description": "Robust pickup truck suitable for work and off-road adventures.",
+		"price": 40000
+	},
+	{
+		"id": "58d507f1-15f2-4f1f-9db8-4a4ef58b7867",
+		"title": "Mercedes-Benz E-Class",
+		"description": "Elegant luxury sedan with a refined interior and advanced safety features.",
+		"price": 60000
+	},
+	{
+		"id": "bd0c50b1-d7a7-4d0d-8a4c-1b14c7efb3e7",
+		"title": "Nissan Rogue",
+		"description": "Versatile crossover with comfortable seating and user-friendly technology.",
+		"price": 28000
+	},
+	{
+		"id": "9bbf0039-3762-4817-9d39-00562a03b8cb",
+		"title": "Audi Q5",
+		"description": "Premium compact SUV offering a blend of performance and luxury.",
+		"price": 50000
+	},
+	{
+		"id": "e3d20e56-9a11-4997-9251-3e17a4e8d7c6",
+		"title": "Subaru Outback",
+		"description": "Rugged crossover wagon with all-wheel drive and ample cargo space.",
+		"price": 32000
+	},
+	{
+		"id": "9e45d0f6-6ac1-4e6e-8046-84d6eae20e05",
+		"title": "Tesla Model S",
+		"description": "Cutting-edge electric sedan with futuristic features and impressive acceleration.",
+		"price": 80000
+	}
+]

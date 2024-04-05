@@ -13,10 +13,8 @@ export default {
 						description: 'Getting product by id',
 						bodyType: 'IProduct',
 					},
-					404: {
-						description: 'Id not found',
-						bodyType: 'String',
-					}
+					404: 'Id not found',
+					500: 'Backend Error',
 				},
 			},
 		},

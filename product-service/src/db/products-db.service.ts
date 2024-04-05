@@ -1,70 +1,97 @@
-import { IProduct } from "../types/api-types";
+import { ICreateProductDTO, IProduct, IStock } from '../types/api-types';
+import { DatabaseService } from './db.service';
+import {
+	GetCommandInput,
+	GetCommandOutput,
+	PutCommandInput,
+	ScanCommandInput,
+	ScanCommandOutput,
+} from '@aws-sdk/lib-dynamodb';
+import { v4 as uuidv4 } from 'uuid';
 
-export class ProductsDbService {
-	private db: IProduct[] = [
-		{
-			count: 4,
-			description: 'Short Product Description1',
-			id: '7567ec4b-b10c-48c5-9345-fc73c48a80aa',
-			price: 2.4,
-			title: 'The AWS product'
-		},
-		{
-			count: 6,
-			description: 'Short Product Description3',
-			id: '7567ec4b-b10c-48c5-9345-fc73c48a80a0',
-			price: 10,
-			title: 'ProductNew'
-		},
-		{
-			count: 7,
-			description: 'Short Product Description2',
-			id: '7567ec4b-b10c-48c5-9345-fc73c48a80a2',
-			price: 23,
-			title: 'ProductTop'
-		},
-		{
-			count: 12,
-			description: 'Short Product Description7',
-			id: '7567ec4b-b10c-48c5-9345-fc73c48a80a1',
-			price: 15,
-			title: 'ProductTitle'
-		},
-		{
-			count: 7,
-			description: 'Short Product Description2',
-			id: '7567ec4b-b10c-48c5-9345-fc73c48a80a3',
-			price: 23,
-			title: 'Product'
-		},
-		{
-			count: 8,
-			description: 'Short Product Description4',
-			id: '7567ec4b-b10c-48c5-9345-fc73348a80a1',
-			price: 15,
-			title: 'ProductTest'
-		},
-		{
-			count: 2,
-			description: 'Short Product Descriptio1',
-			id: '7567ec4b-b10c-48c5-9445-fc73c48a80a2',
-			price: 23,
-			title: 'Product2'
-		},
-		{
-			count: 3,
-			description: 'Short Product Description7',
-			id: '7567ec4b-b10c-45c5-9345-fc73c48a80a1',
-			price: 15,
-			title: 'ProductName'
-		}
-	];
+const ProductsTable: string = process.env.PRODUCTS_TABLE;
+const StocksTable: string = process.env.STOCKS_TABLE;
 
-	public getAllProducts(): IProduct[] {
-		return this.db;
+export class ProductsDbService extends DatabaseService {
+	public async getAllProducts(): Promise<IProduct[]> {
+		const productsParams: ScanCommandInput = {
+			TableName: ProductsTable,
+		};
+		const stocksParams: ScanCommandInput = {
+			TableName: StocksTable,
+		};
+		const productsOutput: ScanCommandOutput = await this.scan(productsParams);
+		const stocksOutput: ScanCommandOutput = await this.scan(stocksParams);
+
+		const products: IProduct[] = productsOutput?.Items as IProduct[];
+		const stocks: IStock[] = stocksOutput?.Items as IStock[];
+		return this.mergeProductsWithStocks(products, stocks);
 	}
 
-	public getProductById(id: string): IProduct {
-		return this.db.find((product: IProduct) => product.id === id);
+	public async getProductById(id: string): Promise<IProduct> {
+		const productParams: GetCommandInput = {
+			TableName: ProductsTable,
+			Key: {
+				id,
+			},
+		};
+
+		const stocksParams: GetCommandInput = {
+			TableName: StocksTable,
+			Key: {
+				product_id: id,
+			},
+		};
+		const productsOutput: GetCommandOutput = await this.get(productParams);
+		const stocksOutput: GetCommandOutput = await this.get(stocksParams);
+
+		const product: IProduct = productsOutput?.Item as IProduct;
+		const stock: IStock = stocksOutput?.Item as IStock;
+		return product && this.mergeProductWithCount(product, stock);
+	}
+
+	public async createProduct(productDTO: ICreateProductDTO): Promise<IProduct> {
+		const id: string = uuidv4();
+		const productParams: PutCommandInput = {
+			TableName: ProductsTable,
+			Item: {
+				id,
+				...productDTO,
+			},
+		};
+
+		const stocksParams: PutCommandInput = {
+			TableName: StocksTable,
+			Item: {
+				product_id: id,
+				count: productDTO.count,
+			},
+		};
+		await this.transactionWrite({
+			TransactItems: [{
+				Put: productParams,
+			}, {
+				Put: stocksParams,
+			}],
+		});
+
+		return {
+			id,
+			...productDTO,
+		};
+	}
+
+	private mergeProductsWithStocks(products: IProduct[] = [], stocks: IStock[] = []): IProduct[] {
+		return products.map((product: IProduct) => {
+			const stock: IStock = stocks.find(({ product_id }: IStock): boolean => product.id == product_id);
+			return this.mergeProductWithCount(product, stock);
+		});
+	}
+
+	private mergeProductWithCount(product: IProduct, stock: IStock): IProduct {
+		return {
+			...product,
+			count: stock?.count || 0,
+		};
 	}
 }

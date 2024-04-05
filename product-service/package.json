@@ -7,14 +7,19 @@
 		"deploy": "sls deploy",
 		"swagger": "sls generate-swagger",
 		"start": "sls offline start",
+		"seed": "node src/db/seed/seed-db.mjs",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"engines": {
 		"node": ">=14.15.0"
 	},
 	"dependencies": {
+		"@aws-sdk/client-dynamodb": "^3.540.0",
+		"@aws-sdk/lib-dynamodb": "^3.540.0",
 		"@middy/core": "^3.4.0",
-		"@middy/http-json-body-parser": "^3.4.0"
+		"@middy/http-json-body-parser": "^3.4.0",
+		"@types/uuid": "^9.0.8",
+		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
 		"@serverless/typescript": "^3.0.0",

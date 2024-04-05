@@ -78,4 +78,8 @@ export abstract class DatabaseService {
 			throw new Error(error);
 		}
 	};
+
+	public destroy(): void {
+		dynamodbClient.destroy();
+	};
 }

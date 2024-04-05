@@ -12,10 +12,11 @@ import { IProduct } from '../../types/api-types';
 
 const SOURCE: string = '[getProductsById]';
 
-const productsDbService: ProductsDbService = new ProductsDbService();
 const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event: ValidatedAPIGatewayProxyEvent<typeof schema>) => {
 	console.log(`Lambda ${ SOURCE } started`);
 	console.log(`Lambda ${ SOURCE } event: ${ JSON.stringify(event) }`);
+	const productsDbService: ProductsDbService = new ProductsDbService();
+
 	try {
 		const id: string = event.pathParameters.id;
 		const product: IProduct = await productsDbService.getProductById(id);
@@ -24,6 +25,8 @@ const getProductsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async
 			: formatJSONResponse({ message: `Product with ${ id } not found` }, 404);
 	} catch (error) {
 		return handleErrorResponse(error, SOURCE);
+	} finally {
+		productsDbService.destroy();
 	}
 };
 

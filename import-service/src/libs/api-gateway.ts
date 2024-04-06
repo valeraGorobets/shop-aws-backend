@@ -1,10 +1,11 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from "aws-lambda"
-import type { FromSchema } from "json-schema-to-ts";
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from 'aws-lambda';
+import type { FromSchema } from 'json-schema-to-ts';
 
 export type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> }
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>
 
 export const formatJSONResponse = (response: any, statusCode: number = 200) => {
+	logResponse(`Success response with ${ statusCode } code`);
 	return {
 		headers: {
 			// Required for CORS support to work
@@ -13,10 +14,14 @@ export const formatJSONResponse = (response: any, statusCode: number = 200) => {
 			'Access-Control-Allow-Credentials': true,
 		},
 		statusCode,
-		body: JSON.stringify(response)
-	}
-}
+		body: JSON.stringify(response),
+	};
+};
 
 export const handleErrorResponse = (error, source: string) => {
-	return formatJSONResponse({ message: `Backend Error in ${ source }: ${ JSON.stringify(error) }` }, 500);
-}
+	const errorText: string = JSON.stringify(error);
+	logResponse(`Error in response: ${ errorText }`);
+	return formatJSONResponse({ message: `Backend Error in ${ source }: ${ errorText }` }, 500);
+};
+
+const logResponse = (message: string) => console.log(message);

@@ -22,10 +22,11 @@ import {
 	TransactWriteCommandInput,
 	TransactWriteCommandOutput,
 } from '@aws-sdk/lib-dynamodb/dist-types/commands/TransactWriteCommand';
+import { DEFAULT_REGION } from '../../../shared.models';
 
 
 const dynamodbClient: DynamoDBClient = new DynamoDBClient({
-	region: 'eu-west-1',
+	region: DEFAULT_REGION,
 });
 const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(dynamodbClient);
 

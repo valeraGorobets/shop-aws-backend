@@ -4,7 +4,7 @@
 	"description": "Serverless aws-nodejs-typescript template",
 	"main": "serverless.ts",
 	"scripts": {
-		"deploy": "sls deploy",
+		"deploy-product-service": "sls deploy",
 		"swagger": "sls generate-swagger",
 		"start": "sls offline start",
 		"seed": "node src/db/seed/seed-db.mjs",

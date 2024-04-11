@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import getProductsList from '@functions/getProductsList';
 import getProductsById from '@functions/getProductsById';
 import createProduct from '@functions/createProduct';
+import catalogBatchProcess from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
 	service: 'product-service',
@@ -37,6 +38,7 @@ const serverlessConfiguration: AWS = {
 			NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
 			PRODUCTS_TABLE: 'ProductsTable',
 			STOCKS_TABLE: 'StocksTable',
+			CATALOG_ITEMS_QUEUE: 'CatalogItemsQueue',
 		},
 		iam: {
 			role: {
@@ -65,6 +67,7 @@ const serverlessConfiguration: AWS = {
 		getProductsList,
 		getProductsById,
 		createProduct,
+		catalogBatchProcess,
 	},
 	resources: {
 		Resources: {
@@ -95,6 +98,30 @@ const serverlessConfiguration: AWS = {
 					],
 					BillingMode: 'PAY_PER_REQUEST'
 				},
+			},
+			CatalogItemsQueue: {
+				Type: 'AWS::SQS::Queue',
+				Properties: {
+					QueueName: '${self:provider.environment.CATALOG_ITEMS_QUEUE}',
+				}
+			}
+		},
+		Outputs: {
+			CatalogItemsQueueUrl: {
+				Value: {
+					Ref: '${self:provider.environment.CATALOG_ITEMS_QUEUE}'
+				},
+				Export: {
+					Name: 'CatalogItemsQueueUrl',
+				}
+			},
+			CatalogItemsQueueArn: {
+				Value: {
+					'Fn::GetAtt': ['${self:provider.environment.CATALOG_ITEMS_QUEUE}', 'Arn']
+				},
+				Export: {
+					Name: 'CatalogItemsQueueArn',
+				}
 			}
 		}
 	},

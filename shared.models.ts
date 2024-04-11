@@ -1,0 +1,1 @@
+export const DEFAULT_REGION: string = 'eu-west-1';

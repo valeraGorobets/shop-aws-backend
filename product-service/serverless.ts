@@ -39,6 +39,7 @@ const serverlessConfiguration: AWS = {
 			PRODUCTS_TABLE: 'ProductsTable',
 			STOCKS_TABLE: 'StocksTable',
 			CATALOG_ITEMS_QUEUE: 'CatalogItemsQueue',
+			SNS_TOPIC_ARN: { Ref: 'SNSTopic' },
 		},
 		iam: {
 			role: {
@@ -59,6 +60,15 @@ const serverlessConfiguration: AWS = {
 							{ 'Fn::GetAtt': ['${self:provider.environment.STOCKS_TABLE}', 'Arn'] },
 						],
 					},
+					{
+						Effect: 'Allow',
+						Action: [
+							'sns:*'
+						],
+						Resource: [
+							{ Ref: 'SNSTopic' }
+						]
+					}
 				],
 			},
 		},
@@ -103,6 +113,22 @@ const serverlessConfiguration: AWS = {
 				Type: 'AWS::SQS::Queue',
 				Properties: {
 					QueueName: '${self:provider.environment.CATALOG_ITEMS_QUEUE}',
+				}
+			},
+			SNSTopic: {
+				Type: 'AWS::SNS::Topic',
+				Properties: {
+					TopicName: 'product-created-notification-sns-topic'
+				}
+			},
+			SNSSubscription: {
+				Type: 'AWS::SNS::Subscription',
+				Properties: {
+					Endpoint: 'valeri_gorobets@epam.com',
+					Protocol: 'email',
+					TopicArn: {
+						Ref: 'SNSTopic'
+					}
 				}
 			}
 		},

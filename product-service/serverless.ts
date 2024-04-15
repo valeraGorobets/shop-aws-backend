@@ -30,8 +30,8 @@ const serverlessConfiguration: AWS = {
 				allowedOrigins: [
 					'http://localhost:4200',
 					'https://d1cu1goqkk0ah.cloudfront.net',
-				]
-			}
+				],
+			},
 		},
 		environment: {
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
@@ -63,12 +63,12 @@ const serverlessConfiguration: AWS = {
 					{
 						Effect: 'Allow',
 						Action: [
-							'sns:*'
+							'sns:*',
 						],
 						Resource: [
-							{ Ref: 'SNSTopic' }
-						]
-					}
+							{ Ref: 'SNSTopic' },
+						],
+					},
 				],
 			},
 		},
@@ -92,7 +92,7 @@ const serverlessConfiguration: AWS = {
 					KeySchema: [
 						{ AttributeName: 'id', KeyType: 'HASH' },
 					],
-					BillingMode: 'PAY_PER_REQUEST'
+					BillingMode: 'PAY_PER_REQUEST',
 				},
 			},
 			StocksTable: {
@@ -106,20 +106,20 @@ const serverlessConfiguration: AWS = {
 					KeySchema: [
 						{ AttributeName: 'product_id', KeyType: 'HASH' },
 					],
-					BillingMode: 'PAY_PER_REQUEST'
+					BillingMode: 'PAY_PER_REQUEST',
 				},
 			},
 			CatalogItemsQueue: {
 				Type: 'AWS::SQS::Queue',
 				Properties: {
 					QueueName: '${self:provider.environment.CATALOG_ITEMS_QUEUE}',
-				}
+				},
 			},
 			SNSTopic: {
 				Type: 'AWS::SNS::Topic',
 				Properties: {
-					TopicName: 'product-created-notification-sns-topic'
-				}
+					TopicName: 'product-created-notification-sns-topic',
+				},
 			},
 			SNSSubscription: {
 				Type: 'AWS::SNS::Subscription',
@@ -127,29 +127,43 @@ const serverlessConfiguration: AWS = {
 					Endpoint: 'valeri_gorobets@epam.com',
 					Protocol: 'email',
 					TopicArn: {
-						Ref: 'SNSTopic'
-					}
-				}
-			}
+						Ref: 'SNSTopic',
+					},
+				},
+			},
+			SNSSubscriptionBmw: {
+				Type: 'AWS::SNS::Subscription',
+				Properties: {
+					Endpoint: 'valera.gorobets@gmail.com',
+					Protocol: 'email',
+					TopicArn: {
+						Ref: 'SNSTopic',
+					},
+					FilterPolicyScope: 'MessageBody',
+					FilterPolicy: {
+						"title": [{"prefix": "BMW"}]
+					},
+				},
+			},
 		},
 		Outputs: {
 			CatalogItemsQueueUrl: {
 				Value: {
-					Ref: '${self:provider.environment.CATALOG_ITEMS_QUEUE}'
+					Ref: '${self:provider.environment.CATALOG_ITEMS_QUEUE}',
 				},
 				Export: {
 					Name: 'CatalogItemsQueueUrl',
-				}
+				},
 			},
 			CatalogItemsQueueArn: {
 				Value: {
-					'Fn::GetAtt': ['${self:provider.environment.CATALOG_ITEMS_QUEUE}', 'Arn']
+					'Fn::GetAtt': ['${self:provider.environment.CATALOG_ITEMS_QUEUE}', 'Arn'],
 				},
 				Export: {
 					Name: 'CatalogItemsQueueArn',
-				}
-			}
-		}
+				},
+			},
+		},
 	},
 	package: { individually: true },
 	custom: {

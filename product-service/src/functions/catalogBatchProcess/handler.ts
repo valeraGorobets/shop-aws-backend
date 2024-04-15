@@ -13,14 +13,18 @@ const catalogBatchProcess: SQSHandler = async (event: SQSEvent) => {
 	const productsDbService: ProductsDbService = new ProductsDbService();
 	const products: ICreateProductDTO[] = event.Records.map(({ body }) => JSON.parse(body) as ICreateProductDTO);
 	await Promise.all(
-		products.map((product: ICreateProductDTO) => productsDbService.createProduct(product)),
+		products.map(async (product: ICreateProductDTO) => {
+			const createdProduct = await productsDbService.createProduct(product);
+
+			return snsClient.send(new PublishCommand({
+				TopicArn: process.env.SNS_TOPIC_ARN,
+				Subject: 'Catalog Batch process notification',
+				Message: JSON.stringify(createdProduct),
+			}));
+		}),
 	);
 
-	await snsClient.send(new PublishCommand({
-		TopicArn: process.env.SNS_TOPIC_ARN,
-		Subject: 'Catalog Batch process notification',
-		Message: `Amount of products added: ${ event.Records.length }`,
-	}));
+
 };
 
 export const main = middy(catalogBatchProcess);

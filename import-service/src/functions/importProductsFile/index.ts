@@ -16,6 +16,9 @@ export default {
 					404: 'File name not provided',
 					500: 'Backend Error',
 				},
+				authorizer: {
+					name: 'importFunctionServiceAuthorizer',
+				},
 			},
 		},
 	],

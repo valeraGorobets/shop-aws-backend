@@ -29,6 +29,15 @@ const serverlessConfiguration: AWS = {
 					'https://d1cu1goqkk0ah.cloudfront.net',
 				],
 			},
+			authorizers: {
+				importFunctionServiceAuthorizer: {
+					type: 'request',
+					resultTtlInSeconds: 0,
+					name: 'importFunctionServiceAuthorizer',
+					functionArn: 'arn:aws:lambda:eu-west-1:058264083835:function:authorization-service-beta-basicAuthorizer',
+					identitySource: '$request.header.Authorization',
+				},
+			},
 		},
 		environment: {
 			BUCKET_NAME: 'import-products-file',
@@ -87,7 +96,7 @@ const serverlessConfiguration: AWS = {
 		},
 		CatalogItemsQueueArn: {
 			'Fn::ImportValue': 'CatalogItemsQueueArn',
-		}
+		},
 	},
 };
 

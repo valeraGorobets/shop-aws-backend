@@ -3,6 +3,7 @@ import path from 'path';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { fileURLToPath } from 'url';
+import { DEFAULT_REGION } from '../../../../shared.models';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,7 +23,7 @@ const TableIdToDynamoDBTableName = {
 };
 
 const dynamodbClient = new DynamoDBClient({
-	region: 'eu-west-1',
+	region: DEFAULT_REGION,
 });
 const documentClient = DynamoDBDocumentClient.from(dynamodbClient);
 

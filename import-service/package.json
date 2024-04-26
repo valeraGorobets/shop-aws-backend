@@ -4,7 +4,7 @@
 	"description": "Serverless aws-nodejs-typescript template",
 	"main": "serverless.ts",
 	"scripts": {
-		"deploy": "sls deploy",
+		"deploy-import-service": "sls deploy",
 		"start": "sls offline start",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.549.0",
+		"@aws-sdk/client-sqs": "^3.552.0",
 		"@aws-sdk/s3-request-presigner": "^3.549.0",
 		"@middy/core": "^3.4.0",
 		"@middy/http-json-body-parser": "^3.4.0",

@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import getProductsList from '@functions/getProductsList';
 import getProductsById from '@functions/getProductsById';
 import createProduct from '@functions/createProduct';
+import catalogBatchProcess from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
 	service: 'product-service',
@@ -29,14 +30,16 @@ const serverlessConfiguration: AWS = {
 				allowedOrigins: [
 					'http://localhost:4200',
 					'https://d1cu1goqkk0ah.cloudfront.net',
-				]
-			}
+				],
+			},
 		},
 		environment: {
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
 			NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
 			PRODUCTS_TABLE: 'ProductsTable',
 			STOCKS_TABLE: 'StocksTable',
+			CATALOG_ITEMS_QUEUE: 'CatalogItemsQueue',
+			SNS_TOPIC_ARN: { Ref: 'SNSTopic' },
 		},
 		iam: {
 			role: {
@@ -57,6 +60,15 @@ const serverlessConfiguration: AWS = {
 							{ 'Fn::GetAtt': ['${self:provider.environment.STOCKS_TABLE}', 'Arn'] },
 						],
 					},
+					{
+						Effect: 'Allow',
+						Action: [
+							'sns:*',
+						],
+						Resource: [
+							{ Ref: 'SNSTopic' },
+						],
+					},
 				],
 			},
 		},
@@ -65,6 +77,7 @@ const serverlessConfiguration: AWS = {
 		getProductsList,
 		getProductsById,
 		createProduct,
+		catalogBatchProcess,
 	},
 	resources: {
 		Resources: {
@@ -79,7 +92,7 @@ const serverlessConfiguration: AWS = {
 					KeySchema: [
 						{ AttributeName: 'id', KeyType: 'HASH' },
 					],
-					BillingMode: 'PAY_PER_REQUEST'
+					BillingMode: 'PAY_PER_REQUEST',
 				},
 			},
 			StocksTable: {
@@ -93,10 +106,64 @@ const serverlessConfiguration: AWS = {
 					KeySchema: [
 						{ AttributeName: 'product_id', KeyType: 'HASH' },
 					],
-					BillingMode: 'PAY_PER_REQUEST'
+					BillingMode: 'PAY_PER_REQUEST',
 				},
-			}
-		}
+			},
+			CatalogItemsQueue: {
+				Type: 'AWS::SQS::Queue',
+				Properties: {
+					QueueName: '${self:provider.environment.CATALOG_ITEMS_QUEUE}',
+				},
+			},
+			SNSTopic: {
+				Type: 'AWS::SNS::Topic',
+				Properties: {
+					TopicName: 'product-created-notification-sns-topic',
+				},
+			},
+			SNSSubscription: {
+				Type: 'AWS::SNS::Subscription',
+				Properties: {
+					Endpoint: 'valeri_gorobets@epam.com',
+					Protocol: 'email',
+					TopicArn: {
+						Ref: 'SNSTopic',
+					},
+				},
+			},
+			SNSSubscriptionBmw: {
+				Type: 'AWS::SNS::Subscription',
+				Properties: {
+					Endpoint: 'valera.gorobets@gmail.com',
+					Protocol: 'email',
+					TopicArn: {
+						Ref: 'SNSTopic',
+					},
+					FilterPolicyScope: 'MessageBody',
+					FilterPolicy: {
+						"title": [{"prefix": "BMW"}]
+					},
+				},
+			},
+		},
+		Outputs: {
+			CatalogItemsQueueUrl: {
+				Value: {
+					Ref: '${self:provider.environment.CATALOG_ITEMS_QUEUE}',
+				},
+				Export: {
+					Name: 'CatalogItemsQueueUrl',
+				},
+			},
+			CatalogItemsQueueArn: {
+				Value: {
+					'Fn::GetAtt': ['${self:provider.environment.CATALOG_ITEMS_QUEUE}', 'Arn'],
+				},
+				Export: {
+					Name: 'CatalogItemsQueueArn',
+				},
+			},
+		},
 	},
 	package: { individually: true },
 	custom: {

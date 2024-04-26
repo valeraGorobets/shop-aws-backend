@@ -34,6 +34,8 @@ const serverlessConfiguration: AWS = {
 			BUCKET_NAME: 'import-products-file',
 			UPLOAD_FOLDER: 'uploaded',
 			PARSED_FOLDER: 'parsed',
+			CATALOG_ITEMS_QUEUE_URL: '${self:custom.CatalogItemsQueueUrl}',
+			CATALOG_ITEMS_QUEUE_ARN: '${self:custom.CatalogItemsQueueArn}',
 			AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
 			NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
 		},
@@ -52,7 +54,16 @@ const serverlessConfiguration: AWS = {
 				'arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/${self:provider.environment.UPLOAD_FOLDER}/*',
 				'arn:aws:s3:::${self:provider.environment.BUCKET_NAME}/${self:provider.environment.PARSED_FOLDER}/*',
 			],
-		}],
+		}, {
+			Effect: 'Allow',
+			Action: [
+				'sqs:*',
+			],
+			Resource: [
+				'${self:provider.environment.CATALOG_ITEMS_QUEUE_ARN}',
+			],
+		}
+		],
 	},
 	// import the function via paths
 	functions: {
@@ -71,6 +82,12 @@ const serverlessConfiguration: AWS = {
 			platform: 'node',
 			concurrency: 10,
 		},
+		CatalogItemsQueueUrl: {
+			'Fn::ImportValue': 'CatalogItemsQueueUrl',
+		},
+		CatalogItemsQueueArn: {
+			'Fn::ImportValue': 'CatalogItemsQueueArn',
+		}
 	},
 };
 
